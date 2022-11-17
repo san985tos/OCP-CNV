@@ -7,4 +7,4 @@
 - As we're using Multus as its default networking CNI we also ensure Multus attaches this NetworkAttachmentDefinition.
 - Lastly we have set the evictionStrategy to LiveMigrate so that any request to move the instance will use this method (we will explore this in more depth in a later lab).
 
-![This is an image](../images/6)
+![This is an image](images/1.png)

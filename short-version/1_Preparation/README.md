@@ -251,27 +251,27 @@
 
 - Setup our Fedora 34 cloud image, let's first connect to our bastion host so we can process and serve the image from there. First ssh to bastion node (password is redhat):
 
-```
-ssh root@192.168.123.100
-```
+  ```
+  ssh root@192.168.123.100
+  ```
 
 - Change directory to /var/www/html where we'll serve the image from via Apache:
 
-```
-cd /var/www/html
-```
+  ```
+  cd /var/www/html
+  ```
 
 - Download the latest Fedora 34 cloud image to this directory:
 
-```
-wget https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/34/Cloud/x86_64/images/Fedora-Cloud-Base-34-1.2.x86_64.raw.xz
-```
+  ```
+  wget https://download-ib01.fedoraproject.org/pub/fedora/linux/releases/34/Cloud/x86_64/images/Fedora-Cloud-Base-34-1.2.x86_64.raw.xz
+  ```
 
 - Wait for the download to complete and extract/decompress the image:
 
-```
-xz -d Fedora-Cloud-Base-34-1.2.x86_64.raw.xz
-```
+  ```
+  xz -d Fedora-Cloud-Base-34-1.2.x86_64.raw.xz
+  ```
 
 - NOTE: You will not see any output, but it may take a minute to complete.
 

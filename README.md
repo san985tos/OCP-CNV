@@ -35,4 +35,5 @@ oc get nodes
 
 ## Deploying OpenShift Virtualization
 
--
+Open the OpenShift console and go to Operator hub menu
+![This is an image](images/1.png)

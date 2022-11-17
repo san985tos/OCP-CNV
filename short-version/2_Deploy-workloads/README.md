@@ -105,4 +105,4 @@ rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
 
 - Click on Create > With Wizard under Administrator > Workloads > Virtualization
 
-![This is an image](images/2.png)
+  ![This is an image](images/2.png)

@@ -13,3 +13,9 @@
   - Pay attention on the worker node.
 
     ![This is an image](images/1.png)
+
+- Additional open a terminal and review the pods (virt-launcher)
+
+  ```
+  watch oc get pods -o wide
+  ```

@@ -72,17 +72,7 @@
   oc get csv -n openshift-storage
   ```
 
-  Example
-
-  ```
-  [root@ocp4-bastion ~]# oc get csv -n openshift-storage
-  NAME                   DISPLAY                       VERSION   REPLACES               PHASE
-  mcg-operator.v4.9.12   NooBaa Operator               4.9.12    mcg-operator.v4.9.11   Succeeded
-  ocs-operator.v4.9.12   OpenShift Container Storage   4.9.12    ocs-operator.v4.9.11   Succeeded
-  odf-operator.v4.9.12   OpenShift Data Foundation     4.9.12    odf-operator.v4.9.11   Succeeded
-  ```
-
-- DO: Create the PVC with all this included:
+- Create the PVC with all this included:
 
   ```
   cat << EOF | oc apply -f -
@@ -150,12 +140,6 @@
   I0317 11:47:00.878420       1 data-processor.go:205] New phase: Complete
   ```
 
-- To view the structure of the importer pod to get some of the configuration it's using
-
-  ```
-  oc describe pod $(oc get pods | awk '/importer/ {print $1;}')
-  ```
-
 - Display the PVC
 
   ```
@@ -166,86 +150,6 @@
 
   ```
   oc get pv
-  ```
-
-### Optional: Inspect the image
-
-- Let's take a look on the Ceph-backed storage system for more information about the image
-- We can do this by matching the PVC to the underlying RBD image
-- First describe the persistent volume to get the UUID of the image name by matching the ID of the PV for rhel8-ocs
-
-  ```
-  oc describe pv/pvc-1a4ea2c5-937c-486d-932c-b2b7d161ec0e | grep imageName
-  ```
-
-- This gives us the imageName we need.
-- Now we need to look at the image on the OpenShift cluster itself. We do this by first attaching to a special pod containing Ceph CLI tools, and then asking for details about the image in question
-
-  ```
-  oc exec -it -n openshift-storage $(oc get pods -n openshift-storage | awk '/tools/ {print $1;}') bash
-  ```
-
-- Now, in the pod's terminal we can use the rbd command to inspect the image, noting we must specify the pool name "ocs-storagecluster-cephblockpool" as this is a "block" type of PV
-
-  ```
-  rbd info csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025 --pool=ocs-storagecluster-cephblockpool
-  ```
-
-  Example:
-
-  ```
-  bash-4.4$ rbd info csi-vol-b9c030c1-661a-11ed-a45d-0a580a80020c --pool=ocs-storagecluster-cephblockpool
-  rbd image 'csi-vol-b9c030c1-661a-11ed-a45d-0a580a80020c':
-      size 40 GiB in 10240 objects
-      order 22 (4 MiB objects)
-      snapshot_count: 0
-      id: 6122fc4c2fd3
-      block_name_prefix: rbd_data.6122fc4c2fd3
-      format: 2
-      features: layering
-      op_features:
-      flags:
-      create_timestamp: Thu Nov 17 01:54:09 2022
-      access_timestamp: Thu Nov 17 01:54:09 2022
-      modify_timestamp: Thu Nov 17 01:54:09 2022
-  ```
-
-- This will display information about the image:
-
-  ```
-  rbd image 'csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025':
-      size 40 GiB in 10240 objects
-      order 22 (4 MiB objects)
-      snapshot_count: 0
-      id: 115b595bde9a
-      block_name_prefix: rbd_data.115b595bde9a
-      format: 2
-      features: layering
-      op_features:
-      flags:
-      create_timestamp: Mon Nov  8 12:28:56 2021
-      access_timestamp: Mon Nov  8 12:28:56 2021
-      modify_timestamp: Mon Nov  8 12:28:56 2021
-  ```
-
-- Then execute an rbd disk-usage request against the same image to see the disk usage; don't forget to specifiy the correct pool:
-
-  ```
-  rbd disk-usage csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025 \
-            --pool=ocs-storagecluster-cephblockpool
-  ```
-
-- This will display the usage:
-
-  ```
-  NAME                                         PROVISIONED USED
-  csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025      40 GiB 8.7 GiB
-  ```
-
-- That's it! Don't forget to exit from the pod when done.
-
-  ```
-  exit
   ```
 
 ## Networking
@@ -267,9 +171,7 @@
   oc get nns/ocp4-worker1.aio.example.com -o yaml
   ```
 
-- spot the interface that we'd like to use to create a bridge, enp3s0, with DHCP being disabled and not in current use - there are no IP addresses associated to that network.
-
-- DO: Apply a new NodeNetworkConfigurationPolicy for our worker nodes to setup a desired state for br1 via enp3s0, noting that in the spec we specify a nodeSelector to ensure that this only gets applied to our worker nodes; eventually allowing us to attach VM's to this bridge
+- Apply a new NodeNetworkConfigurationPolicy for our worker nodes to setup a desired state for br1 via enp3s0, noting that in the spec we specify a nodeSelector to ensure that this only gets applied to our worker nodes; eventually allowing us to attach VM's to this bridge
 
   ```
   cat << EOF | oc apply -f -
@@ -303,7 +205,7 @@
   oc get nnce
   ```
 
-- DO: Check the status (it may take a few checks before all show as "Available", i.e. applied the requested configuration, it will go from "Pending" --> "Progressing" --> "Available"):
+- Check the status (it may take a few checks before all show as "Available", i.e. applied the requested configuration, it will go from "Pending" --> "Progressing" --> "Available"):
 
   ```
   NAME                                                     STATUS
@@ -318,60 +220,7 @@
   oc get nncp
   ```
 
-- We can also dive into the NetworkNodeConfigurationPolicy (nncp) a little further:
-
-  ```
-  oc get nncp/br1-enp3s0-policy-workers -o yaml
-  ```
-
-- You will see NetworkNodeConfigurationPolicy definition in yaml format:
-
-  ```
-  apiVersion: nmstate.io/v1beta1
-  kind: NodeNetworkConfigurationPolicy
-  metadata:
-    annotations:
-      kubectl.kubernetes.io/last-applied-configuration: |
-        {"apiVersion":"nmstate.io/v1alpha1","kind":"NodeNetworkConfigurationPolicy","metadata":{"annotations":{},"name":"br1-enp3s0-policy-workers"},"spec":{"desiredState":{"interfaces":[{"bridge":{"options":{"stp":{"enabled":false}},"port":[{"name":"enp3s0"}]},"description":"Linux bridge with enp3s0 as a port","ipv4":{"enabled":false},"name":"br1","state":"up","type":"linux-bridge"}]},"nodeSelector":{"node-role.kubernetes.io/worker":""}}}
-      nmstate.io/webhook-mutating-timestamp: "1636377787953660263"
-    creationTimestamp: "2021-11-08T13:23:08Z"
-    generation: 1
-    name: br1-enp3s0-policy-workers
-    resourceVersion: "133303"
-    uid: 893f9f6e-c447-44b8-821d-73217341c6d6
-  spec:
-    desiredState:
-      interfaces:
-      - bridge:
-          options:
-            stp:
-              enabled: false
-          port:
-          - name: enp3s0
-        description: Linux bridge with enp3s0 as a port
-        ipv4:
-          enabled: false
-        name: br1
-        state: up
-        type: linux-bridge
-    nodeSelector:
-      node-role.kubernetes.io/worker: ""
-  status:
-    conditions:
-    - lastHearbeatTime: "2021-11-08T13:23:34Z"
-      lastTransitionTime: "2021-11-08T13:23:34Z"
-      message: 3/3 nodes successfully configured
-      reason: SuccessfullyConfigured
-      status: "True"
-      type: Available
-    - lastHearbeatTime: "2021-11-08T13:23:34Z"
-      lastTransitionTime: "2021-11-08T13:23:34Z"
-      reason: SuccessfullyConfigured
-      status: "False"
-      type: Degraded
-  ```
-
-- DO: Let's create the NetworkAttachmentDefinition, this associates the bridge we just defined with a logical name, known here as 'tuning-bridge-fixed':
+- Let's create the NetworkAttachmentDefinition, this associates the bridge we just defined with a logical name, known here as 'tuning-bridge-fixed':
 
   ```
   cat << EOF | oc apply -f -
@@ -397,5 +246,3 @@
     }'
   EOF
   ```
-
-- Start deploying VMs

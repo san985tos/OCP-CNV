@@ -37,3 +37,4 @@ oc get route duckhunt-js
 ```
 
 Open the route and enjoy
+![This is an image](./images/doghunt.png)

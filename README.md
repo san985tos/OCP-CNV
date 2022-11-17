@@ -215,6 +215,68 @@
 - Now we need to look at the image on the OpenShift cluster itself. We do this by first attaching to a special pod containing Ceph CLI tools, and then asking for details about the image in question
 
   ```
-  oc exec -it -n openshift-storage \
-  $(oc get pods -n openshift-storage | awk '/tools/ {print $1;}') bash
+  oc exec -it -n openshift-storage $(oc get pods -n openshift-storage | awk '/tools/ {print $1;}') bash
+  ```
+
+- Now, in the pod's terminal we can use the rbd command to inspect the image, noting we must specify the pool name "ocs-storagecluster-cephblockpool" as this is a "block" type of PV
+
+  ```
+  rbd info csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025 --pool=ocs-storagecluster-cephblockpool
+  ```
+
+  Example:
+
+  ```
+  bash-4.4$ rbd info csi-vol-b9c030c1-661a-11ed-a45d-0a580a80020c --pool=ocs-storagecluster-cephblockpool
+  rbd image 'csi-vol-b9c030c1-661a-11ed-a45d-0a580a80020c':
+      size 40 GiB in 10240 objects
+      order 22 (4 MiB objects)
+      snapshot_count: 0
+      id: 6122fc4c2fd3
+      block_name_prefix: rbd_data.6122fc4c2fd3
+      format: 2
+      features: layering
+      op_features:
+      flags:
+      create_timestamp: Thu Nov 17 01:54:09 2022
+      access_timestamp: Thu Nov 17 01:54:09 2022
+      modify_timestamp: Thu Nov 17 01:54:09 2022
+  ```
+
+- This will display information about the image:
+
+  ```
+  rbd image 'csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025':
+      size 40 GiB in 10240 objects
+      order 22 (4 MiB objects)
+      snapshot_count: 0
+      id: 115b595bde9a
+      block_name_prefix: rbd_data.115b595bde9a
+      format: 2
+      features: layering
+      op_features:
+      flags:
+      create_timestamp: Mon Nov  8 12:28:56 2021
+      access_timestamp: Mon Nov  8 12:28:56 2021
+      modify_timestamp: Mon Nov  8 12:28:56 2021
+  ```
+
+- Then execute an rbd disk-usage request against the same image to see the disk usage; don't forget to specifiy the correct pool:
+
+  ```
+  rbd disk-usage csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025 \
+            --pool=ocs-storagecluster-cephblockpool
+  ```
+
+- This will display the usage:
+
+  ```
+  NAME                                         PROVISIONED USED
+  csi-vol-70d062c5-408f-11ec-a2b0-0a580a830025      40 GiB 8.7 GiB
+  ```
+
+- That's it! Don't forget to exit from the pod when done.
+
+  ```
+  exit
   ```

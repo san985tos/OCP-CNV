@@ -118,4 +118,5 @@ rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
   - Persistent Volume Claim Size: 40 GB
   - Advance Settings:
     - Storage Class: ocs-storagecluster-ceph-rbd
-      ![This is an image](images/4.png)
+
+  ![This is an image](images/4.png)

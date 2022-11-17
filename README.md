@@ -115,7 +115,7 @@
   odf-operator.v4.9.12   OpenShift Data Foundation     4.9.12    odf-operator.v4.9.11   Succeeded
   ```
 
-- create the PVC with all this included:
+- DO: Create the PVC with all this included:
 
   ```
   cat << EOF | oc apply -f -
@@ -151,7 +151,7 @@
   importer-rhel8-ocs     0/1     ContainerCreating   0          1s
   ```
 
-- Watch the logs and you can see the process, it may initially give an error about the pod waiting to start, you can retry after a few seconds:
+- DO: Watch the logs and you can see the process, it may initially give an error about the pod waiting to start, you can retry after a few seconds:
 
   ```
   oc logs importer-rhel8-ocs -f
@@ -302,7 +302,7 @@
 
 - spot the interface that we'd like to use to create a bridge, enp3s0, with DHCP being disabled and not in current use - there are no IP addresses associated to that network.
 
-- STEP: Apply a new NodeNetworkConfigurationPolicy for our worker nodes to setup a desired state for br1 via enp3s0, noting that in the spec we specify a nodeSelector to ensure that this only gets applied to our worker nodes; eventually allowing us to attach VM's to this bridge
+- DO: Apply a new NodeNetworkConfigurationPolicy for our worker nodes to setup a desired state for br1 via enp3s0, noting that in the spec we specify a nodeSelector to ensure that this only gets applied to our worker nodes; eventually allowing us to attach VM's to this bridge
 
   ```
   cat << EOF | oc apply -f -
@@ -336,7 +336,7 @@
   oc get nnce
   ```
 
-- STEP: Check the status (it may take a few checks before all show as "Available", i.e. applied the requested configuration, it will go from "Pending" --> "Progressing" --> "Available"):
+- DO: Check the status (it may take a few checks before all show as "Available", i.e. applied the requested configuration, it will go from "Pending" --> "Progressing" --> "Available"):
 
   ```
   NAME                                                     STATUS
@@ -404,7 +404,7 @@
       type: Degraded
   ```
 
-- STEP: Let's create the NetworkAttachmentDefinition, this associates the bridge we just defined with a logical name, known here as 'tuning-bridge-fixed':
+- DO: Let's create the NetworkAttachmentDefinition, this associates the bridge we just defined with a logical name, known here as 'tuning-bridge-fixed':
 
   ```
   cat << EOF | oc apply -f -

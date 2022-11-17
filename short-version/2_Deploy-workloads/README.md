@@ -9,6 +9,8 @@
 
 ![This is an image](images/1.png)
 
+## Deploy a VM from a YAML file
+
 - Let's apply this VM configuration via the CLI first:
 
   ```
@@ -98,3 +100,9 @@ oc get vmi
 NAME               AGE   PHASE     IP    NODENAME                       READY
 rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
 ```
+
+## Deploy a VMs from Wizard
+
+- Click on Create > With Wizard under Administrator > Workloads > Virtualization
+
+![This is an image](images/2)

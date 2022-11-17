@@ -60,3 +60,6 @@ watch -n2 'oc get pods -n openshift-cnv'
 ```
 oc get csv -n openshift-cnv
 ```
+
+- Description of the pods:
+  ![This is an image](images/6.png)

@@ -430,3 +430,5 @@
     }'
   EOF
   ```
+
+- Start deploying VMs

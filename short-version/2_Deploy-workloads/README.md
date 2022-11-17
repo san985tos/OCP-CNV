@@ -136,3 +136,4 @@ rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
       ![This is an image](images/6.png)
   - 5 Review
     - Click "Create Virtual Machine"
+      ![This is an image](images/7.png)

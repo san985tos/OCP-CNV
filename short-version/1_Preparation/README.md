@@ -387,15 +387,58 @@ spec:
             claimName: fc34-original
 ```
 
-- Create the file on CLI
+- Create the VM with the YAML file on CLI
 
   ```
   vi fedora.yaml
   oc create -f fedora.yaml
   ```
 
-- Then exit from the bastion host:
+- Open Fedora VM console and install apache and figlet
+
+  ```
+  dnf install -y httpd figlet
+
+  ```
+
+- Modify /var/www/html/index.html and enable/start httpd
+
+  ```
+    ___                   ____  _     _  __ _    __     ___      _
+  / _ \ _ __   ___ _ __ / ___|| |__ (_)/ _| |_  \ \   / (_)_ __| |_
+  | | | | '_ \ / _ \ '_ \\___ \| '_ \| | |_| __|  \ \ / /| | '__| __|
+  | |_| | |_) |  __/ | | |___) | | | | |  _| |_    \ V / | | |  | |_
+  \___/| .__/ \___|_| |_|____/|_| |_|_|_|  \__|    \_/  |_|_|   \__|
+      |_|
+     _                         __               ____ _
+  __| | ___ _ __ ___   ___    / _| ___  _ __   / ___| | __ _ _ __ ___
+  / _` |/ _ \ '_ ` _ \ / _ \  | |_ / _ \| '__| | |   | |/ _` | '__/ _ \
+  | (_| |  __/ | | | | | (_) | |  _| (_) | |    | |___| | (_| | | | (_) |
+  \__,_|\___|_| |_| |_|\___/  |_|  \___/|_|     \____|_|\__,_|_|  \___/
+
+  ____             _       _
+  / ___|_   _  __ _| |_ ___| |
+  | |  _| | | |/ _` | __/ _ \ |
+  | |_| | |_| | (_| | ||  __/_|
+  \____|\__,_|\__,_|\__\___(_)
+  ```
 
 ```
-exit
+
+```
+
+systemctl enable httpd
+systemctl start httpd
+
+```
+
+- Test service
+
+```
+
+curl localhost:80
+
+```
+
+- exit VM console
 ```

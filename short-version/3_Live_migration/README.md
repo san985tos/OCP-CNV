@@ -6,8 +6,10 @@
 - If this is set to LiveMigrate and the underlying node are placed into maintenance mode, VMs can be automatically moved between nodes with minimal interruption.
 
 - From the OpenShift console:
+
   - select the virtual machine
   - Actions > Migarte Virtual Machine
   - Confirm
   - Pay attention on the worker node.
+
     ![This is an image](images/1.png)

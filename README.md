@@ -280,3 +280,128 @@
   ```
   exit
   ```
+
+## Networking
+
+- With OpenShift Virtualization (or more specifically, OpenShift in general - regardless of the workload type) we have a few different options for networking.
+- We can just have our virtual machines be attached to the same pod networks that our containers would have access to, or we can configure more "real-world" virtualisation networking constructs like bridged networking, SR/IOV, and so on.
+- It's also possible to have a combination of these, e.g. both pod networking and a bridged interface directly attached to a VM at the same time, using Multus, the default networking CNI in OpenShift 4.x.
+- Multus allows multiple "sub-CNI" devices to be attached to a pod (regardless of whether a virtual machine is running there).
+- In this lab we're going to utilise pod networking and a secondary network interface provided by a bridge on the underlying worker nodes (hypervisors).
+- Each of the worker nodes has been configured with an additional network interface enp3s0
+- we'll create a bridge device, called br1, so we can attach our virtual machines to it
+- this network is actually the same L2 network as the one attached to enp2s0, so it's on the lab network ( 192.168.123.0/24) as well.
+
+- The first step is to use the new Kubernetes NetworkManager state configuration to setup the underlying hosts to our liking.
+- Recall that we can get the current state by requesting the NetworkNodeState (much of the following is snipped for brevity):
+
+  ```
+  oc get nns
+  oc get nns/ocp4-worker1.aio.example.com -o yaml
+  ```
+
+- spot the interface that we'd like to use to create a bridge, enp3s0, with DHCP being disabled and not in current use - there are no IP addresses associated to that network.
+
+- Now we can apply a new NodeNetworkConfigurationPolicy for our worker nodes to setup a desired state for br1 via enp3s0, noting that in the spec we specify a nodeSelector to ensure that this only gets applied to our worker nodes; eventually allowing us to attach VM's to this bridge
+
+  ```
+  cat << EOF | oc apply -f -
+  apiVersion: nmstate.io/v1alpha1
+  kind: NodeNetworkConfigurationPolicy
+  metadata:
+    name: br1-enp3s0-policy-workers
+  spec:
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+    desiredState:
+      interfaces:
+        - name: br1
+          description: Linux bridge with enp3s0 as a port
+          type: linux-bridge
+          state: up
+          ipv4:
+            enabled: false
+          bridge:
+            options:
+              stp:
+                enabled: false
+            port:
+              - name: enp3s0
+  EOF
+  ```
+
+- Then enquire as to whether it was successfully applied:
+
+  ```
+  oc get nnce
+  ```
+
+- Check the status (it may take a few checks before all show as "Available", i.e. applied the requested configuration, it will go from "Pending" --> "Progressing" --> "Available"):
+
+  ```
+  NAME                                                     STATUS
+  ocp4-worker1.aio.example.com.br1-enp3s0-policy-workers   Available
+  ocp4-worker2.aio.example.com.br1-enp3s0-policy-workers   Available
+  ocp4-worker3.aio.example.com.br1-enp3s0-policy-workers   Available
+  ```
+
+- You can also request the status of the overall policy:
+
+  ```
+  oc get nncp
+  ```
+
+- We can also dive into the NetworkNodeConfigurationPolicy (nncp) a little further:
+
+  ```
+  oc get nncp/br1-enp3s0-policy-workers -o yaml
+  ```
+
+- You will see NetworkNodeConfigurationPolicy definition in yaml format:
+
+  ```
+  apiVersion: nmstate.io/v1beta1
+  kind: NodeNetworkConfigurationPolicy
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"nmstate.io/v1alpha1","kind":"NodeNetworkConfigurationPolicy","metadata":{"annotations":{},"name":"br1-enp3s0-policy-workers"},"spec":{"desiredState":{"interfaces":[{"bridge":{"options":{"stp":{"enabled":false}},"port":[{"name":"enp3s0"}]},"description":"Linux bridge with enp3s0 as a port","ipv4":{"enabled":false},"name":"br1","state":"up","type":"linux-bridge"}]},"nodeSelector":{"node-role.kubernetes.io/worker":""}}}
+      nmstate.io/webhook-mutating-timestamp: "1636377787953660263"
+    creationTimestamp: "2021-11-08T13:23:08Z"
+    generation: 1
+    name: br1-enp3s0-policy-workers
+    resourceVersion: "133303"
+    uid: 893f9f6e-c447-44b8-821d-73217341c6d6
+  spec:
+    desiredState:
+      interfaces:
+      - bridge:
+          options:
+            stp:
+              enabled: false
+          port:
+          - name: enp3s0
+        description: Linux bridge with enp3s0 as a port
+        ipv4:
+          enabled: false
+        name: br1
+        state: up
+        type: linux-bridge
+    nodeSelector:
+      node-role.kubernetes.io/worker: ""
+  status:
+    conditions:
+    - lastHearbeatTime: "2021-11-08T13:23:34Z"
+      lastTransitionTime: "2021-11-08T13:23:34Z"
+      message: 3/3 nodes successfully configured
+      reason: SuccessfullyConfigured
+      status: "True"
+      type: Available
+    - lastHearbeatTime: "2021-11-08T13:23:34Z"
+      lastTransitionTime: "2021-11-08T13:23:34Z"
+      reason: SuccessfullyConfigured
+      status: "False"
+      type: Degraded
+  ```
+
+-

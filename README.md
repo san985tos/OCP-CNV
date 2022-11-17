@@ -48,3 +48,15 @@ oc get nodes
 - This will open a new screen. We can again accept all the defaults for this lab. Continue the installation by clicking on "Create" at the bottom.
 
 ![This is an image](images/5.png)
+
+- After a while, all these pods must be in RUNNING status
+
+```
+watch -n2 'oc get pods -n openshift-cnv'
+```
+
+- The operator installation just be in succeded
+
+```
+oc get csv -n openshift-cnv
+```

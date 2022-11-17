@@ -201,7 +201,7 @@
   oc get pv
   ```
 
-### Inspect the image
+### Optional: Inspect the image
 
 - Let's take a look on the Ceph-backed storage system for more information about the image
 - We can do this by matching the PVC to the underlying RBD image
@@ -302,7 +302,7 @@
 
 - spot the interface that we'd like to use to create a bridge, enp3s0, with DHCP being disabled and not in current use - there are no IP addresses associated to that network.
 
-- Now we can apply a new NodeNetworkConfigurationPolicy for our worker nodes to setup a desired state for br1 via enp3s0, noting that in the spec we specify a nodeSelector to ensure that this only gets applied to our worker nodes; eventually allowing us to attach VM's to this bridge
+- STEP: Apply a new NodeNetworkConfigurationPolicy for our worker nodes to setup a desired state for br1 via enp3s0, noting that in the spec we specify a nodeSelector to ensure that this only gets applied to our worker nodes; eventually allowing us to attach VM's to this bridge
 
   ```
   cat << EOF | oc apply -f -
@@ -336,7 +336,7 @@
   oc get nnce
   ```
 
-- Check the status (it may take a few checks before all show as "Available", i.e. applied the requested configuration, it will go from "Pending" --> "Progressing" --> "Available"):
+- STEP: Check the status (it may take a few checks before all show as "Available", i.e. applied the requested configuration, it will go from "Pending" --> "Progressing" --> "Available"):
 
   ```
   NAME                                                     STATUS
@@ -404,4 +404,29 @@
       type: Degraded
   ```
 
--
+- STEP: Let's create the NetworkAttachmentDefinition, this associates the bridge we just defined with a logical name, known here as 'tuning-bridge-fixed':
+
+  ```
+  cat << EOF | oc apply -f -
+  apiVersion: "k8s.cni.cncf.io/v1"
+  kind: NetworkAttachmentDefinition
+  metadata:
+    name: tuning-bridge-fixed
+    annotations:
+      k8s.v1.cni.cncf.io/resourceName: bridge.network.kubevirt.io/br1
+  spec:
+    config: '{
+      "cniVersion": "0.3.1",
+      "name": "groot",
+      "plugins": [
+        {
+          "type": "cnv-bridge",
+          "bridge": "br1"
+        },
+        {
+          "type": "tuning"
+        }
+      ]
+    }'
+  EOF
+  ```

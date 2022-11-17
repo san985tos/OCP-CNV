@@ -41,5 +41,10 @@ Open the OpenShift console and go to Operator hub menu
 ![This is an image](images/2.png)
 ![This is an image](images/3.png)
 
-Next we need to deploy the HyperConverged resource, which, in addition to the OpenShift Virtualization operator, creates and maintains an OpenShift Virtualization Deployment for the cluster.
+Next we need to deploy the HyperConverged resource, which, in addition to the OpenShift Virtualization operator, creates and maintains an OpenShift Virtualization Deployment for the cluster. Click on "Create HyperConverged", as a required operand, in the same screen to proceed.
+
 ![This is an image](images/4.png)
+
+This will open a new screen. We can again accept all the defaults for this lab
+
+![This is an image](images/5.png)

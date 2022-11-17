@@ -201,4 +201,17 @@
   oc get pv
   ```
 
--
+### Inspect the image
+
+    - Let's take a look on the Ceph-backed storage system for more information about the image
+    - We can do this by matching the PVC to the underlying RBD image
+    - First describe the persistent volume to get the UUID of the image name by matching the ID of the PV for rhel8-ocs
+        ```
+        oc describe pv/pvc-1a4ea2c5-937c-486d-932c-b2b7d161ec0e | grep imageName
+        ```
+    - This gives us the imageName we need.
+    - Now we need to look at the image on the OpenShift cluster itself. We do this by first attaching to a special pod containing Ceph CLI tools, and then asking for details about the image in question
+        ```
+        oc exec -it -n openshift-storage \
+            $(oc get pods -n openshift-storage | awk '/tools/ {print $1;}') bash
+        ```

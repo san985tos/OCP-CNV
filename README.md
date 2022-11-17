@@ -2,8 +2,8 @@
 
 ## Login to the lab
 
-- The environment "OpenShift AIO with OCP Virtualization" is needed from RHPDS
-- Login to bastion with the information from received email
+- The environment "OpenShift AIO with OCP Virtualization" is needed from RHPDS.
+- Login to lab host with the information from received email
 
 ```
 ❯ ssh lab-user@145.40.121.163
@@ -13,7 +13,7 @@ Activate the web console with: systemctl enable --now cockpit.socket
 [lab-user@hypervisor ~]$
 ```
 
-- SSH to bastion
+- SSH to bastion then
 
 ```
 [lab-user@hypervisor ~]$ ssh root@192.168.123.100
@@ -26,4 +26,16 @@ Activate the web console with: systemctl enable --now cockpit.socket
 
 Last login: Wed Nov 16 23:54:35 2022 from 192.168.123.104
 [root@ocp4-bastion ~]#
+```
+
+- Get kubeadmin password of the environment
+
+```
+echo $(cat /root/ocp-install/auth/kubeadmin-password)
+```
+
+- Get the console URL
+
+```
+oc whoami --show-console
 ```

@@ -106,3 +106,16 @@ rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
 - Click on Create > With Wizard under Administrator > Workloads > Virtualization
 
   ![This is an image](images/2.png)
+
+- Select RHEL 8 template and then next
+
+  ![This is an image](images/3.png)
+
+- Select the following options and then click next:
+
+  - Boot Source type: Import via URL (creates PVC)
+  - Import URL: http://192.168.123.100:81/rhel8-kvm.img
+  - Persistent Volume Claim Size: 40 GB
+  - Advance Settings:
+    - Storage Class: ocs-storagecluster-ceph-rbd
+      ![This is an image](images/4.png)

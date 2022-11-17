@@ -37,3 +37,5 @@ oc get nodes
 
 Open the OpenShift console and go to Operator hub menu
 ![This is an image](images/1.png)
+![This is an image](images/2.png)
+![This is an image](images/3.png)

@@ -45,6 +45,6 @@ oc get nodes
 
 ![This is an image](images/4.png)
 
-- This will open a new screen. We can again accept all the defaults for this lab
+- This will open a new screen. We can again accept all the defaults for this lab. Continue the installation by clicking on "Create" at the bottom.
 
 ![This is an image](images/5.png)

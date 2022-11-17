@@ -90,3 +90,115 @@
   ```
   oc get nns/ocp4-worker1.aio.example.com -o yaml
   ```
+
+## Storage
+
+- Check Storage Classes of the lab
+
+  ```
+  oc get sc
+  ```
+
+- Then check which version of the OCS operator is installed by executing the following
+
+  ```
+  oc get csv -n openshift-storage
+  ```
+
+  Example
+
+  ```
+  [root@ocp4-bastion ~]# oc get csv -n openshift-storage
+  NAME                   DISPLAY                       VERSION   REPLACES               PHASE
+  mcg-operator.v4.9.12   NooBaa Operator               4.9.12    mcg-operator.v4.9.11   Succeeded
+  ocs-operator.v4.9.12   OpenShift Container Storage   4.9.12    ocs-operator.v4.9.11   Succeeded
+  odf-operator.v4.9.12   OpenShift Data Foundation     4.9.12    odf-operator.v4.9.11   Succeeded
+  ```
+
+- create the PVC with all this included:
+
+  ```
+  cat << EOF | oc apply -f -
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: "rhel8-ocs"
+    labels:
+      app: containerized-data-importer
+    annotations:
+      cdi.kubevirt.io/storage.import.endpoint: "http://192.168.123.100:81/rhel8-kvm.img"
+  spec:
+    volumeMode: Block
+    storageClassName: ocs-storagecluster-ceph-rbd
+    accessModes:
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: 40Gi
+  EOF
+  ```
+
+- Once created, CDI triggers the importer pod automatically to take care of the conversion for you:
+
+  ```
+  oc get pods
+  ```
+
+- You should see the importer pod as below:
+
+  ```
+  NAME                   READY   STATUS              RESTARTS   AGE
+  importer-rhel8-ocs     0/1     ContainerCreating   0          1s
+  ```
+
+- Watch the logs and you can see the process, it may initially give an error about the pod waiting to start, you can retry after a few seconds:
+
+  ```
+  oc logs importer-rhel8-ocs -f
+  ```
+
+- You will see the log output as below:
+
+  ```
+  I1103 17:33:42.409423       1 importer.go:52] Starting importer
+  I1103 17:33:42.442150       1 importer.go:135] begin import process
+  I1103 17:33:42.447139       1 data-processor.go:329] Calculating available size
+  I1103 17:33:42.448349       1 data-processor.go:337] Checking out block volume size.
+  I1103 17:33:42.448380       1 data-processor.go:349] Request image size not empty.
+  I1103 17:33:42.448395       1 data-processor.go:354] Target size 40Gi.
+  I1103 17:33:42.448977       1 nbdkit.go:269] Waiting for nbdkit PID.
+  I1103 17:33:42.949247       1 nbdkit.go:290] nbdkit ready.
+  I1103 17:33:42.949288       1 data-processor.go:232] New phase: Convert
+  I1103 17:33:42.949328       1 data-processor.go:238] Validating image
+  I1103 17:33:42.969690       1 qemu.go:250] 0.00
+  I1103 17:33:47.145392       1 qemu.go:250] 1.02
+  I1103 17:33:53.728302       1 qemu.go:250] 2.03
+  I1103 17:33:55.924329       1 qemu.go:250] 3.05
+  I1103 17:33:58.014054       1 qemu.go:250] 4.06
+  (...)
+  I0317 11:46:56.253155       1 prometheus.go:69] 98.24
+  I0317 11:46:57.253350       1 prometheus.go:69] 100.00
+  I0317 11:47:00.195494       1 data-processor.go:205] New phase: Resize
+  I0317 11:47:00.524989       1 data-processor.go:268] Expanding image size to: 40Gi
+  I0317 11:47:00.878420       1 data-processor.go:205] New phase: Complete
+  ```
+
+- To view the structure of the importer pod to get some of the configuration it's using
+
+  ```
+  oc describe pod $(oc get pods | awk '/importer/ {print $1;}')
+  ```
+
+- Display the PVC
+
+  ```
+  oc get pvc
+  ```
+
+- Display the PVs
+
+  ```
+  oc get pv
+  ```
+
+-

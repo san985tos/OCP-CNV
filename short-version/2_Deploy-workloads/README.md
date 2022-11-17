@@ -111,7 +111,7 @@ rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
 
   ![This is an image](images/3.png)
 
-- Select the following options and then click next:
+- Select the following options and then click on "Customize Virtual Machine":
 
   - Boot Source type: Import via URL (creates PVC)
   - Import URL: http://192.168.123.100:81/rhel8-kvm.img
@@ -120,3 +120,19 @@ rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
     - Storage Class: ocs-storagecluster-ceph-rbd
 
   ![This is an image](images/4.png)
+
+- On the "Customize virtual machine" screen
+  - 1 General:
+    - Name: RHEL8-demo-test
+  - 2 Networking:
+    - Click on "Add another network interface"
+    - Name: nic-0
+    - Model: e1000e
+    - Network: tuning-bridge-fixed
+    - Type: Bridge
+      ![This is an image](images/5.png)
+  - 3 Storage
+    - Edit root disk to use "ocs-storagecluster-ceph-rbd"
+      ![This is an image](images/6.png)
+  - 5 Review
+    - Click "Create Virtual Machine"

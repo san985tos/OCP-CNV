@@ -146,3 +146,10 @@ rhel8-server-ocs   15s   Running         ocp4-worker3.aio.example.com   True
     - Click "Create Virtual Machine"
 
       ![This is an image](images/7.png)
+
+## Choosing RHEL or Windows
+
+- Using Wizard when creating a VM, OpenShift give us the link to get whether a Windows or RHEL image
+
+  ![This is an image](images/8.png)
+  ![This is an image](images/9.png)

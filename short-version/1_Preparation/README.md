@@ -277,15 +277,15 @@ xz -d Fedora-Cloud-Base-34-1.2.x86_64.raw.xz
 
 - Check the cloud image file:
 
-```
-ls -l | grep -i fedora
-```
+  ```
+  ls -l | grep -i fedora
+  ```
 
 - It should show the following:
 
-```
--rw-r--r--. 1 root root  5368709120 Nov  5 08:40 Fedora-Cloud-Base-37-1.7.x86_64.raw
-```
+  ```
+  -rw-r--r--. 1 root root  5368709120 Nov  5 08:40 Fedora-Cloud-Base-37-1.7.x86_64.raw
+  ```
 
 - Now we need to customise this image, we're going to do the following:
 
@@ -294,27 +294,27 @@ ls -l | grep -i fedora
 
 - Install libguestfs-tools so we can modify the image:
 
-```
-dnf install libguestfs-tools -y
-```
+  ```
+  dnf install libguestfs-tools -y
+  ```
 
 - Enable libvirtd service as it's a dependency for libguestfs:
 
-```
-systemctl enable --now libvirtd
-```
+  ```
+  systemctl enable --now libvirtd
+  ```
 
 - Now we're ready to customise the downloaded image. First we enable ssh logins for root and mark the system for an SELinux relabel:
 
-```
-virt-customize -a /var/www/html/Fedora-Cloud-Base-34-1.2.x86_64.raw --run-command 'sed -i s/^#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config && touch /.autorelabel'
-```
+  ```
+  virt-customize -a /var/www/html/Fedora-Cloud-Base-34-1.2.x86_64.raw --run-command 'sed -i s/^#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config && touch /.autorelabel'
+  ```
 
 - Then remove cloud-init (as we don't need it during this lab) and set the root password to "redhat":
 
-```
-virt-customize -a /var/www/html/Fedora-Cloud-Base-34-1.2.x86_64.raw --uninstall=cloud-init --root-password password:redhat --ssh-inject root:file:/root/.ssh/id_rsa.pub
-```
+  ```
+  virt-customize -a /var/www/html/Fedora-Cloud-Base-34-1.2.x86_64.raw --uninstall=cloud-init --root-password password:redhat --ssh-inject root:file:/root/.ssh/id_rsa.pub
+  ```
 
 - Create a Fedora VM
 
@@ -403,15 +403,15 @@ spec:
 
 - Modify /var/www/html/index.html and enable/start httpd
 
-```
-systemctl enable httpd
-systemctl start httpd
-```
+  ```
+  systemctl enable httpd
+  systemctl start httpd
+  ```
 
 - Test service
 
-```
-curl localhost:80
-```
+  ```
+  curl localhost:80
+  ```
 
 - exit VM console

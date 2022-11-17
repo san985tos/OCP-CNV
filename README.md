@@ -26,3 +26,9 @@ echo $(cat /root/ocp-install/auth/kubeadmin-password)
 ```
 oc whoami --show-console
 ```
+
+- Validate the cluster is healty
+
+```
+oc get nodes
+```

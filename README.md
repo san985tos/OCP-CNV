@@ -36,6 +36,10 @@ oc get nodes
 ## Deploying OpenShift Virtualization
 
 Open the OpenShift console and go to Operator hub menu
+
 ![This is an image](images/1.png)
 ![This is an image](images/2.png)
 ![This is an image](images/3.png)
+
+Next we need to deploy the HyperConverged resource, which, in addition to the OpenShift Virtualization operator, creates and maintains an OpenShift Virtualization Deployment for the cluster.
+![This is an image](images/4.png)
